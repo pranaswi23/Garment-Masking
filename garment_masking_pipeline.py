@@ -83,7 +83,8 @@ for filename in os.listdir(input_folder):
         
         # Create a binary garment mask
         binary_mask = create_binary_garment_mask(image, prediction)
-        
+        binary_mask_image = Image.fromarray(binary_mask)
+        binary_mask_image.save(os.path.join(output_folder, f"binarymask_{filename}"))
         # Convert PIL image to numpy array for further processing
         image_np = np.array(image)
         
@@ -91,17 +92,26 @@ for filename in os.listdir(input_folder):
         lower_bound, upper_bound = get_hsv_bounds(filename)
         hsv_image = cv2.cvtColor(image_np, cv2.COLOR_RGB2HSV)
         garment_hsv_mask = cv2.inRange(hsv_image, lower_bound, upper_bound)
-        
+        garment_mask_image = Image.fromarray(garment_hsv_mask)
+        garment_mask_image.save(os.path.join(output_folder, f"garmentmask_{filename}"))
         # Combine the HSV mask with the binary garment mask (AND operation)
         final_mask = cv2.bitwise_and(binary_mask, garment_hsv_mask)
-        
+        final_mask1 = cv2.bitwise_not(final_mask)
         # Save the final mask image
-        final_mask_image = Image.fromarray(final_mask)
+        final_mask_image = Image.fromarray(final_mask1)
         final_mask_image.save(os.path.join(output_folder, f"mask_{filename}"))
 
         # Optionally, save the original image with the mask applied
-        result_image = cv2.bitwise_and(image_np, image_np, mask=final_mask)
+        mask_3ch = cv2.cvtColor(final_mask1, cv2.COLOR_GRAY2BGR)
+        gray_pixel = np.array([128, 128, 128], dtype=np.uint8)
+        gray_image = np.full_like(image_np, gray_pixel)
+        # Use the mask to blend: where mask is white → use original, where mask is black → use gray
+        result_image = np.where(mask_3ch == 255, image_np, gray_image)
+        print("imagenps", image_np.shape, "finals",final_mask1.shape)
+        #result_image = cv2.bitwise_and(image_np, image_np, mask=final_mask1)
+        
         result_image = Image.fromarray(result_image)
+
         result_image.save(os.path.join(output_folder, f"processed_{filename}"))
 
 print("Processing complete. Masks and processed images saved to the output folder.")
