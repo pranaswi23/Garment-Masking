@@ -1,3 +1,5 @@
+#I took the reference from here "https://github.com/Jaxkirat/Binary-Garment-Masking" and customized the garment_masking_pipeline.py file according to my requirements
+
 # Garment Masking Pipeline
 
 This repository contains a garment masking pipeline designed to accurately extract garment areas from a set of images. The pipeline produces binary masks for each image, highlighting the garment in white and the background in black.
@@ -7,7 +9,7 @@ This repository contains a garment masking pipeline designed to accurately extra
 The pipeline utilizes a combination of Mask R-CNN and custom HSV (Hue, Saturation, Value) bounds to create accurate binary masks for garments in input images. The masks are then refined by applying specific HSV bounds tailored to each image. The final output consists of binary masks and optionally processed images with the masks applied.
 
 ## Requirements
-
+"
 - Python 3.7 or higher
 - Required Python packages (install via `requirements.txt`):
   - OpenCV
